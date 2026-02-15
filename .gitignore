@@ -180,3 +180,7 @@ pyrightconfig.json
 test-results/
 playwright-report/
 .playwright/
+
+### Allure ###
+allure-results/
+allure-report/

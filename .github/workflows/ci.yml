@@ -37,3 +37,30 @@ jobs:
 
       - name: Run tests
         run: pytest -v
+
+      - name: Generate Allure report (HTML)
+        if: always()
+        run: |
+          if [ -d allure-results ] && [ "$(ls -A allure-results 2>/dev/null)" ]; then
+            docker run --rm -v $PWD/allure-results:/allure-results -v $PWD/allure-report:/allure-report \
+              andgineer/allure:2.31.0 allure generate /allure-results -o /allure-report --clean
+          fi
+        continue-on-error: true
+
+      - name: Upload Allure report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-report
+          path: allure-report/
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Upload Allure results (raw)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-results
+          path: allure-results/
+          retention-days: 14
+          if-no-files-found: ignore

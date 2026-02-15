@@ -86,6 +86,54 @@ pytest playwright/api/test_api_posts.py::test_ct001_get_posts_status_200 -v
 
 **Dica:** Para validar só a API (mais rápido, sem browser), use `pytest -m api` ou `pytest playwright/api/`.
 
+## 📊 Relatório Allure
+
+Cada execução do `pytest` gera resultados no formato **Allure** na pasta `allure-results/` (configurado no `pytest.ini`). Com isso você pode abrir um relatório em HTML ao final das execuções.
+
+### Como ver o relatório localmente
+
+1. **Instale o Allure CLI** (necessário para gerar/abrir o relatório):
+   - **Windows (scoop):** `scoop install allure`
+   - **Windows (choco):** `choco install allure`
+   - **Mac:** `brew install allure`
+   - Ou baixe em: [https://github.com/allure-framework/allure2/releases](https://github.com/allure-framework/allure2/releases)
+
+2. **Rode os testes** (como de costume):
+   ```bash
+   pytest -v
+   ```
+
+3. **Abra o relatório** no navegador:
+   ```bash
+   allure serve allure-results
+   ```
+   Ou gere a pasta estática e abra depois:
+   ```bash
+   allure generate allure-results -o allure-report --clean
+   allure open allure-report
+   ```
+
+### Esquema de execução
+
+| Etapa | O que acontece |
+|-------|-----------------|
+| 1 | Você roda `pytest` (ou `pytest -m e2e` / `pytest -m api`). |
+| 2 | O pytest grava os resultados em `allure-results/` (limpa e preenche a cada execução). |
+| 3 | Você roda `allure serve allure-results` para ver o relatório no browser. |
+
+As pastas `allure-results/` e `allure-report/` estão no `.gitignore` e não são commitadas.
+
+### Relatório no GitHub Actions
+
+No **CI**, após cada run o workflow gera o relatório HTML e disponibiliza como **artefato**:
+
+- Abra o repositório no GitHub → **Actions** → clique na execução desejada.
+- Na seção **Artifacts**, baixe **allure-report** (relatório HTML) ou **allure-results** (dados brutos).
+- Se baixar **allure-report**: descompacte e abra o `index.html` no navegador.
+- Se baixar **allure-results**: na sua máquina rode `allure serve <pasta-descompactada>` para ver o relatório.
+
+Os artefatos ficam disponíveis por **14 dias**.
+
 ## 📚 Documentação dos Casos de Teste
 
 | Documento | Descrição | Arquivo de teste |
@@ -138,10 +186,12 @@ pythonpath = .
 markers =
     e2e: end-to-end test (browser/UI)
     api: API test (HTTP requests)
+addopts = --alluredir=allure-results --clean-alluredir
 ```
 
 - **`e2e`** — testes em `playwright/e2e/` (interface com Playwright).
 - **`api`** — testes em `playwright/api/` (chamadas HTTP com requests).
+- **`addopts`** — toda execução do pytest grava resultados Allure em `allure-results/` para gerar o relatório depois.
 
 ### Variáveis de ambiente (opcional)
 
@@ -164,9 +214,9 @@ O projeto está configurado para rodar no **GitHub Actions**:
 
 - **Workflow:** `.github/workflows/ci.yml`
 - **Gatilhos:** push e pull request nas branches `main` e `master`
-- **Passos:** checkout → Python 3.11 → cache pip → `pip install -r requirements.txt` → `playwright install --with-deps` → `pytest -v`
+- **Passos:** checkout → Python 3.11 → cache pip → `pip install -r requirements.txt` → `playwright install --with-deps` → `pytest -v` → geração do relatório Allure (HTML) → upload dos artefatos **allure-report** e **allure-results**
 
-Não é necessário configurar secrets para os testes atuais (E2E na Amazon e API no JSONPlaceholder).
+Não é necessário configurar secrets para os testes atuais (E2E na Amazon e API no JSONPlaceholder). O relatório Allure fica disponível como artefato da execução (ver seção [Relatório Allure](#-relatório-allure)).
 
 ## 📦 Dependências
 
@@ -174,6 +224,7 @@ Não é necessário configurar secrets para os testes atuais (E2E na Amazon e AP
 - **pytest-playwright** – testes E2E no browser
 - **playwright** – automação de browser
 - **requests** – chamadas HTTP nos testes de API
+- **allure-pytest** – geração dos resultados para o relatório Allure
 
 Definidas em `requirements.txt`.
 
