@@ -49,7 +49,7 @@ pytest playwright/e2e/test_api_posts.py::test_ct001_get_posts_status_200 -v
 
 | Documento | Descrição | Arquivos de teste |
 |-----------|-----------|-------------------|
-| **[docs/test-cases.md](docs/test-cases.md)** | E2E Amazon.com.br – busca de livro, fluxo de compra | `playwright/e2e/test_amazon_busca_livro.py` |
+| **[docs/test-cases-e2e.md](docs/test-cases-e2e.md)** | E2E Amazon.com.br – busca de livro, fluxo de compra | `playwright/e2e/test_amazon_busca_livro.py` |
 | **[docs/test-cases-api.md](docs/test-cases-api.md)** | API JSONPlaceholder – GET/POST `/posts` | `playwright/e2e/test_api_posts.py` |
 
 ### Testes E2E (Amazon)
@@ -147,7 +147,7 @@ Quando se trata de utilização de IA tenho algumas considerações a serem aval
 **1. Qual ferramenta ou técnica de IA foi utilizada?**  
 *(Ex: TestRigor, Mabl, Applitools com IA visual, ChatGPT para geração de testes)*
 
-As questões 1 e 2 foram respondidas com auxílio da IA através da IDE **Cursor**. O programa é derivado do VS Code e tem uma inteligência artificial integrada que auxilia (via chat), inclusive refatorando código ou testando manualmente — é possível configurar para a IA testar manualmente os cenários antes de automatizar.
+As questões 1 e 2 foram respondidas com auxílio da IA através da IDE **Cursor**. O programa é derivado do VS Code e tem uma inteligência artificial integrada que auxilia (via chat), inclusive refatorando código ou testando manualmente (SIM, você pode configurar pra IA testar manualmente os cenários antes de automatizar).
 
 **2. Para qual propósito a IA foi aplicada?**  
 *(Ex: geração automática de casos de teste, detecção de falhas visuais, automação de scripts)*
