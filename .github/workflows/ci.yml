@@ -43,7 +43,7 @@ jobs:
         run: |
           if [ -d allure-results ] && [ "$(ls -A allure-results 2>/dev/null)" ]; then
             docker run --rm -v $PWD/allure-results:/allure-results -v $PWD/allure-report:/allure-report \
-              andgineer/allure:2.31.0 allure generate /allure-results -o /allure-report --clean
+              andgineer/allure:2 allure generate /allure-results -o /allure-report --clean
           fi
         continue-on-error: true
 
