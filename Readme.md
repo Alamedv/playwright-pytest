@@ -2,6 +2,38 @@
 
 Projeto de automação com **testes E2E** (Playwright) e **testes de API** (requests + pytest), alinhado à documentação de casos de teste em `docs/`.
 
+---
+
+## 📖 Como funciona o projeto
+
+Este repositório reúne **dois tipos de automação** em um único projeto: testes que simulam o uso do navegador (**E2E**) e testes que chamam APIs HTTP diretamente (**API**). Tudo é executado pelo **pytest**.
+
+### Onde está cada tipo de teste
+
+| Tipo | Ferramenta | Pasta | O que testa |
+|------|------------|--------|-------------|
+| **E2E** | Playwright (pytest-playwright) | `playwright/e2e/` | Fluxos na interface (ex.: Amazon.com.br – busca de livro) |
+| **API** | requests + pytest | `playwright/api/` | Endpoints REST (ex.: JSONPlaceholder – GET/POST `/posts`) |
+
+Os testes **E2E** ficam em `playwright/e2e/` porque usam browser (Playwright). Os testes **API** ficam em `playwright/api/` porque não usam interface gráfica — apenas chamadas HTTP. Assim fica claro o que é cada coisa e fácil rodar só um tipo.
+
+### Fluxo de uso
+
+1. **Documentação primeiro** — Os casos de teste (CT001, CT002, etc.) estão descritos em `docs/`: `test-cases-e2e.md` (E2E) e `test-cases-api.md` (API). O código em `playwright/e2e/` e `playwright/api/` segue essa documentação.
+2. **Um comando roda tudo** — `pytest` executa E2E e API. Você pode rodar só E2E (`pytest -m e2e`), só API (`pytest -m api`) ou por pasta/arquivo.
+3. **Configuração central** — O `pytest.ini` na raiz define o `pythonpath` e as **markers** (`e2e` e `api`) para filtrar testes.
+
+### Markers (filtrar o que rodar)
+
+| Marker | Uso | Exemplo |
+|--------|-----|--------|
+| `e2e` | Apenas testes E2E (browser) | `pytest -m e2e` |
+| `api` | Apenas testes de API (HTTP) | `pytest -m api` |
+
+**Resumo:** `docs/` = *o quê* testar; `playwright/e2e/` = testes de interface; `playwright/api/` = testes de API; `pytest` orquestra a execução. Instale as dependências, rode `playwright install` se for executar E2E, e use `pytest` (ou `pytest -m e2e` / `pytest -m api`) para rodar os testes.
+
+---
+
 ## 📋 Pré-requisitos
 
 - Python 3.11+
@@ -28,35 +60,44 @@ playwright install
 # Todos os testes (E2E + API)
 pytest
 
-# Apenas testes marcados como E2E
+# Apenas testes E2E (browser)
 pytest -m e2e
+
+# Apenas testes de API (sem abrir browser)
+pytest -m api
 
 # Com relatório detalhado
 pytest -v
+
+# Por pasta
+pytest playwright/e2e/ -v          # só E2E
+pytest playwright/api/ -v          # só API
 
 # E2E em modo visual (headed)
 pytest playwright/e2e/test_amazon_busca_livro.py -v --headed
 
 # Testes de API (JSONPlaceholder /posts)
-pytest playwright/e2e/test_api_posts.py -v
+pytest playwright/api/test_api_posts.py -v
 
 # Teste específico
 pytest playwright/e2e/test_amazon_busca_livro.py::test_ct001_busca_livro_com_sucesso -v --headed
-pytest playwright/e2e/test_api_posts.py::test_ct001_get_posts_status_200 -v
+pytest playwright/api/test_api_posts.py::test_ct001_get_posts_status_200 -v
 ```
+
+**Dica:** Para validar só a API (mais rápido, sem browser), use `pytest -m api` ou `pytest playwright/api/`.
 
 ## 📚 Documentação dos Casos de Teste
 
-| Documento | Descrição | Arquivos de teste |
-|-----------|-----------|-------------------|
+| Documento | Descrição | Arquivo de teste |
+|-----------|-----------|------------------|
 | **[docs/test-cases-e2e.md](docs/test-cases-e2e.md)** | E2E Amazon.com.br – busca de livro, fluxo de compra | `playwright/e2e/test_amazon_busca_livro.py` |
-| **[docs/test-cases-api.md](docs/test-cases-api.md)** | API JSONPlaceholder – GET/POST `/posts` | `playwright/e2e/test_api_posts.py` |
+| **[docs/test-cases-api.md](docs/test-cases-api.md)** | API JSONPlaceholder – GET/POST `/posts` | `playwright/api/test_api_posts.py` |
 
 ### Testes E2E (Amazon)
 
 - **Ambiente:** `https://www.amazon.com.br/`
 - **CT001:** Busca do livro com sucesso (acesso, busca, resultados, página do produto).
-- Detalhes e demais casos: [docs/test-cases.md](docs/test-cases.md).
+- Detalhes e demais casos: [docs/test-cases-e2e.md](docs/test-cases-e2e.md).
 
 ### Testes de API (JSONPlaceholder)
 
@@ -70,18 +111,22 @@ pytest playwright/e2e/test_api_posts.py::test_ct001_get_posts_status_200 -v
 ```
 playwright-pytest/
 ├── docs/
-│   ├── test-cases-e2e.md          # Casos de teste E2E – Amazon
-│   └── test-cases-api.md      # Casos de teste API – JSONPlaceholder
+│   ├── test-cases-e2e.md              # Casos de teste E2E – Amazon
+│   └── test-cases-api.md              # Casos de teste API – JSONPlaceholder
 ├── playwright/
-│   └── e2e/
-│       ├── test_amazon_busca_livro.py   # CT001 E2E (busca livro)
-│       └── test_api_posts.py            # CT001–CT005 API (/posts)
+│   ├── e2e/                            # Testes E2E (browser)
+│   │   └── test_amazon_busca_livro.py # CT001 E2E (busca livro)
+│   └── api/                            # Testes de API (HTTP)
+│       └── test_api_posts.py           # CT001–CT005 API (/posts)
 ├── prompts/
-│   └── sdet-automator.prompt.md        # Fluxo SDET (exploração + implementação)
+│   └── sdet-automator.prompt.md       # Fluxo SDET (exploração + implementação)
 ├── requirements.txt
 ├── pytest.ini
 └── README.md
 ```
+
+- **`playwright/e2e/`** — testes que usam o navegador (Playwright). Exige `playwright install`.
+- **`playwright/api/`** — testes que só fazem requisições HTTP. Não precisa de browser.
 
 ## 🔧 Configuração
 
@@ -91,8 +136,12 @@ playwright-pytest/
 [pytest]
 pythonpath = .
 markers =
-    e2e: end-to-end test
+    e2e: end-to-end test (browser/UI)
+    api: API test (HTTP requests)
 ```
+
+- **`e2e`** — testes em `playwright/e2e/` (interface com Playwright).
+- **`api`** — testes em `playwright/api/` (chamadas HTTP com requests).
 
 ### Variáveis de ambiente (opcional)
 

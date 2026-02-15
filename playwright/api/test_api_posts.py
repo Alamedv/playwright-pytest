@@ -19,14 +19,14 @@ def _random_string(length=12):
 # --- CT001: GET /posts com sucesso ---
 
 
-@pytest.mark.e2e
+@pytest.mark.api
 def test_ct001_get_posts_status_200():
     """Passo 1–2: GET /posts executado com sucesso, status 200."""
     resp = requests.get(POSTS_URL)
     assert resp.status_code == 200
 
 
-@pytest.mark.e2e
+@pytest.mark.api
 def test_ct001_get_posts_response_is_json():
     """Passo 3: Resposta é JSON."""
     resp = requests.get(POSTS_URL)
@@ -34,14 +34,14 @@ def test_ct001_get_posts_response_is_json():
     resp.json()
 
 
-@pytest.mark.e2e
+@pytest.mark.api
 def test_ct001_get_posts_response_is_list():
     """Passo 4: Resposta é lista de objetos."""
     data = requests.get(POSTS_URL).json()
     assert isinstance(data, list)
 
 
-@pytest.mark.e2e
+@pytest.mark.api
 def test_ct001_get_posts_required_fields():
     """Passo 5: Cada objeto tem userId, id, title, body."""
     data = requests.get(POSTS_URL).json()
@@ -54,14 +54,14 @@ def test_ct001_get_posts_required_fields():
 # --- CT002: Validação do conteúdo da resposta GET ---
 
 
-@pytest.mark.e2e
+@pytest.mark.api
 def test_ct002_get_count_greater_than_zero():
     """Quantidade de registros > 0."""
     data = requests.get(POSTS_URL).json()
     assert len(data) > 0
 
 
-@pytest.mark.e2e
+@pytest.mark.api
 def test_ct002_get_id_is_numeric():
     """Tipo de id é numérico."""
     data = requests.get(POSTS_URL).json()
@@ -69,7 +69,7 @@ def test_ct002_get_id_is_numeric():
         assert isinstance(item["id"], (int, float))
 
 
-@pytest.mark.e2e
+@pytest.mark.api
 def test_ct002_get_user_id_is_numeric():
     """Tipo de userId é numérico."""
     data = requests.get(POSTS_URL).json()
@@ -77,7 +77,7 @@ def test_ct002_get_user_id_is_numeric():
         assert isinstance(item["userId"], (int, float))
 
 
-@pytest.mark.e2e
+@pytest.mark.api
 def test_ct002_get_title_is_string():
     """Tipo de title é string."""
     data = requests.get(POSTS_URL).json()
@@ -85,7 +85,7 @@ def test_ct002_get_title_is_string():
         assert isinstance(item["title"], str)
 
 
-@pytest.mark.e2e
+@pytest.mark.api
 def test_ct002_get_body_is_string():
     """Tipo de body é string."""
     data = requests.get(POSTS_URL).json()
@@ -106,14 +106,14 @@ def _post_random_payload():
     return requests.post(POSTS_URL, json=payload)
 
 
-@pytest.mark.e2e
+@pytest.mark.api
 def test_ct003_post_status_201():
     """POST executado, status 201."""
     resp = _post_random_payload()
     assert resp.status_code == 201
 
 
-@pytest.mark.e2e
+@pytest.mark.api
 def test_ct003_post_returns_json():
     """Resposta do POST é JSON."""
     resp = _post_random_payload()
@@ -124,7 +124,7 @@ def test_ct003_post_returns_json():
 # --- CT004: Validação do ID retornado no POST ---
 
 
-@pytest.mark.e2e
+@pytest.mark.api
 def test_ct004_post_id_exists_and_not_null():
     """Campo id existe e não é nulo."""
     resp = _post_random_payload()
@@ -133,7 +133,7 @@ def test_ct004_post_id_exists_and_not_null():
     assert data["id"] is not None
 
 
-@pytest.mark.e2e
+@pytest.mark.api
 def test_ct004_post_id_is_numeric():
     """Tipo do id é numérico."""
     resp = _post_random_payload()
@@ -144,7 +144,7 @@ def test_ct004_post_id_is_numeric():
 # --- CT005: Estrutura da resposta POST ---
 
 
-@pytest.mark.e2e
+@pytest.mark.api
 def test_ct005_post_response_has_all_fields():
     """Resposta contém userId, title, body, id."""
     resp = _post_random_payload()
