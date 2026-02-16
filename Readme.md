@@ -6,35 +6,20 @@ Projeto de automação com **testes E2E** (Playwright) e **testes de API** (requ
 
 ## 📖 Como funciona o projeto
 
-Este repositório reúne **dois tipos de automação** em um único projeto: testes que simulam o uso do navegador (**E2E**) e testes que chamam APIs HTTP diretamente (**API**). Tudo é executado pelo **pytest**.
-
-### Onde está cada tipo de teste
+Dois tipos de automação em um único projeto: testes no navegador (**E2E**) e testes de API (**HTTP**). Tudo roda com **pytest**.
 
 | Tipo | Ferramenta | Pasta | O que testa |
 |------|------------|--------|-------------|
-| **E2E** | Playwright (pytest-playwright) | `playwright/e2e/` | Fluxos na interface (ex.: Amazon.com.br – busca de livro) |
-| **API** | requests + pytest | `playwright/api/` | Endpoints REST (ex.: JSONPlaceholder – GET/POST `/posts`) |
+| **E2E** | Playwright | `playwright/e2e/` | Interface (ex.: Amazon.com.br – busca de livro) |
+| **API** | requests + pytest | `playwright/api/` | REST (ex.: JSONPlaceholder – GET/POST `/posts`) |
 
-Os testes **E2E** ficam em `playwright/e2e/` porque usam browser (Playwright). Os testes **API** ficam em `playwright/api/` porque não usam interface gráfica — apenas chamadas HTTP. Assim fica claro o que é cada coisa e fácil rodar só um tipo.
-
-### Fluxo de uso
-
-1. **Documentação primeiro** — Os casos de teste (CT001, CT002, etc.) estão descritos em `docs/`: `test-cases-e2e.md` (E2E) e `test-cases-api.md` (API). O código em `playwright/e2e/` e `playwright/api/` segue essa documentação.
-2. **Um comando roda tudo** — `pytest` executa E2E e API. Você pode rodar só E2E (`pytest -m e2e`), só API (`pytest -m api`) ou por pasta/arquivo.
-3. **Configuração central** — O `pytest.ini` na raiz define o `pythonpath` e as **markers** (`e2e` e `api`) para filtrar testes.
-
-### Markers (filtrar o que rodar)
-
-| Marker | Uso | Exemplo |
-|--------|-----|--------|
-| `e2e` | Apenas testes E2E (browser) | `pytest -m e2e` |
-| `api` | Apenas testes de API (HTTP) | `pytest -m api` |
-
-**Resumo:** `docs/` = *o quê* testar; `playwright/e2e/` = testes de interface; `playwright/api/` = testes de API; `pytest` orquestra a execução. Instale as dependências, rode `playwright install` se for executar E2E, e use `pytest` (ou `pytest -m e2e` / `pytest -m api`) para rodar os testes.
+- **Documentação:** casos de teste em `docs/test-cases-e2e.md` e `docs/test-cases-api.md`; o código segue essa documentação.
+- **Execução:** `pytest` roda tudo; use `pytest -m e2e` (só E2E) ou `pytest -m api` (só API).
+- **Configuração:** `pytest.ini` define `pythonpath` e os markers `e2e` e `api`.
 
 ---
 
-## 📋 Pré-requisitos
+## 📋 Pré-requisitos e instalação
 
 - Python 3.11+
 - pip
@@ -43,180 +28,105 @@ Os testes **E2E** ficam em `playwright/e2e/` porque usam browser (Playwright). O
 ## 🚀 Instalação
 
 ```bash
-# Clone o repositório
 git clone <url-do-repositorio>
 cd playwright-pytest
-
-# Instale as dependências
 pip install -r requirements.txt
-
-# Browsers (necessário apenas para testes E2E)
-playwright install
+playwright install   # só para testes E2E
 ```
 
-## 🧪 Executando os Testes
+---
+
+## 🧪 Executando os testes
 
 ```bash
-# Todos os testes (E2E + API)
-pytest
-
-# Apenas testes E2E (browser)
-pytest -m e2e
-
-# Apenas testes de API (sem abrir browser)
-pytest -m api
-
-# Com relatório detalhado
-pytest -v
-
-# Por pasta
-pytest playwright/e2e/ -v          # só E2E
-pytest playwright/api/ -v          # só API
-
-# E2E em modo visual (headed)
-pytest playwright/e2e/test_amazon_busca_livro.py -v --headed
-
-# Testes de API (JSONPlaceholder /posts)
+pytest                    # todos
+pytest -m e2e            # só E2E
+pytest -m api             # só API (rápido, sem browser)
+pytest -v                 # verboso
+pytest playwright/e2e/ -v
 pytest playwright/api/test_api_posts.py -v
 
-# Teste específico
-pytest playwright/e2e/test_amazon_busca_livro.py::test_ct001_busca_livro_com_sucesso -v --headed
-pytest playwright/api/test_api_posts.py::test_ct001_get_posts_status_200 -v
+python -m pytest playwright/e2e/test_amazon_busca_livro.py -v --headed | *comando alternativo 
+
+
 ```
 
-**Dica:** Para validar só a API (mais rápido, sem browser), use `pytest -m api` ou `pytest playwright/api/`.
+E2E em modo visual: `pytest playwright/e2e/test_amazon_busca_livro.py -v --headed`
+
+---
 
 ## 📊 Relatório Allure
 
-Cada execução do `pytest` gera resultados no formato **Allure** na pasta `allure-results/` (configurado no `pytest.ini`). Com isso você pode abrir um relatório em HTML ao final das execuções.
+Cada execução do `pytest` grava resultados em `allure-results/` (configurado no `pytest.ini`). O relatório em HTML é gerado a partir dessa pasta.
 
-### Como ver o relatório localmente
+### Ver localmente
 
-1. **Instale o Allure CLI** (necessário para gerar/abrir o relatório):
-   - **Windows (scoop):** `scoop install allure`
-   - **Windows (choco):** `choco install allure`
-   - **Mac:** `brew install allure`
-   - Ou baixe em: [https://github.com/allure-framework/allure2/releases](https://github.com/allure-framework/allure2/releases)
+1. **Instale o Allure CLI:** `scoop install allure` ou `choco install allure` (Windows), `brew install allure` (Mac), ou [releases](https://github.com/allure-framework/allure2/releases).
+2. Depois de rodar `pytest`, abra o relatório: **`allure serve allure-results`** (sobe um servidor e abre no navegador).
+3. Alternativa: `allure generate allure-results -o allure-report --clean` e depois `allure open allure-report`.
 
-2. **Rode os testes** (como de costume):
-   ```bash
-   pytest -v
-   ```
+Não abra o `index.html` com duplo clique (ficará em "Loading..." por restrições do navegador). Use sempre `allure serve` ou `allure open`.
 
-3. **Abra o relatório** no navegador:
-   ```bash
-   allure serve allure-results
-   ```
-   Ou gere a pasta estática e abra depois:
-   ```bash
-   allure generate allure-results -o allure-report --clean
-   allure open allure-report
-   ```
+### Ver no CI (GitHub Actions)
 
-### Esquema de execução
+- **URL pública (GitHub Pages):** `https://<SEU_USUARIO>.github.io/<NOME_DO_REPOSITORIO>/`  
+  Ative em **Settings → Pages → Source: GitHub Actions**. O relatório é atualizado a cada push em `main`/`master`.
+- **Artefatos:** em **Actions** → execução → **Artifacts** baixe **allure-report** ou **allure-results** (disponíveis 14 dias).
 
-| Etapa | O que acontece |
-|-------|-----------------|
-| 1 | Você roda `pytest` (ou `pytest -m e2e` / `pytest -m api`). |
-| 2 | O pytest grava os resultados em `allure-results/` (limpa e preenche a cada execução). |
-| 3 | Você roda `allure serve allure-results` para ver o relatório no browser. |
+| Se você tem… | Como visualizar |
+|--------------|-----------------|
+| Pasta **allure-results** (local ou descompactada) | `allure serve .` na pasta |
+| Pasta **allure-report** (descompactada) | Na pasta: `python -m http.server 8800` e acesse http://localhost:8800. Não abra `index.html` direto. |
 
-As pastas `allure-results/` e `allure-report/` estão no `.gitignore` e não são commitadas.
+As pastas `allure-results/` e `allure-report/` estão no `.gitignore`.
 
-### Relatório no GitHub Actions
+---
 
-No **CI**, após cada run o workflow gera o relatório HTML e disponibiliza como **artefato**:
+## 📚 Casos de teste e estrutura
 
-- Abra o repositório no GitHub → **Actions** → clique na execução desejada.
-- Na seção **Artifacts**, baixe **allure-report** (relatório HTML) ou **allure-results** (dados brutos).
-- Se baixar **allure-report**: descompacte e abra o `index.html` no navegador.
-- Se baixar **allure-results**: na sua máquina rode `allure serve <pasta-descompactada>` para ver o relatório.
-
-Os artefatos ficam disponíveis por **14 dias**.
-
-## 📚 Documentação dos Casos de Teste
-
-| Documento | Descrição | Arquivo de teste |
-|-----------|-----------|------------------|
-| **[docs/test-cases-e2e.md](docs/test-cases-e2e.md)** | E2E Amazon.com.br – busca de livro, fluxo de compra | `playwright/e2e/test_amazon_busca_livro.py` |
-| **[docs/test-cases-api.md](docs/test-cases-api.md)** | API JSONPlaceholder – GET/POST `/posts` | `playwright/api/test_api_posts.py` |
-
-### Testes E2E (Amazon)
-
-- **Ambiente:** `https://www.amazon.com.br/`
-- **CT001:** Busca do livro com sucesso (acesso, busca, resultados, página do produto).
-- Detalhes e demais casos: [docs/test-cases-e2e.md](docs/test-cases-e2e.md).
-
-### Testes de API (JSONPlaceholder)
-
-- **Base URL:** `https://jsonplaceholder.typicode.com` — recurso `/posts`
-- **CT001–CT002:** GET `/posts` (status 200, JSON, lista, campos obrigatórios e tipos).
-- **CT003–CT005:** POST `/posts` (status 201, massa aleatória, id e estrutura da resposta).
-- Detalhes: [docs/test-cases-api.md](docs/test-cases-api.md).
-
-## 📁 Estrutura do Projeto
+| Documento | Descrição | Código |
+|-----------|-----------|--------|
+| [docs/test-cases-e2e.md](docs/test-cases-e2e.md) | E2E Amazon.com.br – busca de livro | `playwright/e2e/test_amazon_busca_livro.py` |
+| [docs/test-cases-api.md](docs/test-cases-api.md) | API JSONPlaceholder – GET/POST `/posts` | `playwright/api/test_api_posts.py` |
 
 ```
 playwright-pytest/
-├── docs/
-│   ├── test-cases-e2e.md              # Casos de teste E2E – Amazon
-│   └── test-cases-api.md              # Casos de teste API – JSONPlaceholder
+├── docs/           # Casos de teste (E2E e API)
 ├── playwright/
-│   ├── e2e/                            # Testes E2E (browser)
-│   │   └── test_amazon_busca_livro.py # CT001 E2E (busca livro)
-│   └── api/                            # Testes de API (HTTP)
-│       └── test_api_posts.py           # CT001–CT005 API (/posts)
+│   ├── e2e/        # Testes no browser (Playwright)
+│   └── api/        # Testes HTTP (requests)
 ├── prompts/
-│   └── sdet-automator.prompt.md       # Fluxo SDET (exploração + implementação)
 ├── requirements.txt
 ├── pytest.ini
 └── README.md
 ```
 
-- **`playwright/e2e/`** — testes que usam o navegador (Playwright). Exige `playwright install`.
-- **`playwright/api/`** — testes que só fazem requisições HTTP. Não precisa de browser.
+---
 
 ## 🔧 Configuração
 
-### pytest.ini
+**pytest.ini:** `pythonpath`, markers `e2e` e `api`, e `--alluredir=allure-results --clean-alluredir` (para o relatório Allure).
 
-```ini
-[pytest]
-pythonpath = .
-markers =
-    e2e: end-to-end test (browser/UI)
-    api: API test (HTTP requests)
-addopts = --alluredir=allure-results --clean-alluredir
-```
+**Variáveis de ambiente (opcional):** URL base ou headless para E2E; base URL da API pode ser externalizada no código.
 
-- **`e2e`** — testes em `playwright/e2e/` (interface com Playwright).
-- **`api`** — testes em `playwright/api/` (chamadas HTTP com requests).
-- **`addopts`** — toda execução do pytest grava resultados Allure em `allure-results/` para gerar o relatório depois.
-
-### Variáveis de ambiente (opcional)
-
-- Para E2E: uso de URL base ou headless pode ser configurado conforme necessidade.
-- Para API: a base URL do JSONPlaceholder está fixa no código; pode ser externalizada se desejar.
+---
 
 ## 🐛 Debug
 
 ```bash
-# Modo debug com Playwright Inspector (E2E)
 PWDEBUG=1 pytest playwright/e2e/test_amazon_busca_livro.py
-
-# Screenshots e vídeos (E2E)
 pytest playwright/e2e/test_amazon_busca_livro.py --screenshot on --video on
 ```
 
+---
+
 ## 🔄 CI (GitHub Actions)
 
-O projeto está configurado para rodar no **GitHub Actions**:
+**Workflow:** `.github/workflows/ci.yml` — push/PR em `main` e `master`. Passos: checkout, Python 3.11, dependências, Playwright, `pytest`, geração do Allure Report, upload de artefatos e deploy no GitHub Pages (em push em `main`/`master`).
 
-- **Workflow:** `.github/workflows/ci.yml`
-- **Gatilhos:** push e pull request nas branches `main` e `master`
-- **Passos:** checkout → Python 3.11 → cache pip → `pip install -r requirements.txt` → `playwright install --with-deps` → `pytest -v` → geração do relatório Allure (HTML) → upload dos artefatos **allure-report** e **allure-results**
+Sem secrets necessários para os testes atuais. Para o relatório em URL pública, ative **Settings → Pages → Source: GitHub Actions** (detalhes na seção [Relatório Allure](#-relatório-allure)).
 
-Não é necessário configurar secrets para os testes atuais (E2E na Amazon e API no JSONPlaceholder). O relatório Allure fica disponível como artefato da execução (ver seção [Relatório Allure](#-relatório-allure)).
+---
 
 ## 📦 Dependências
 
@@ -236,9 +146,9 @@ Definidas em `requirements.txt`.
 
 **1. Quais aspectos você avaliaria ao testar uma aplicação similar ao ChatGPT ([chatgpt.com](https://chatgpt.com/))?**
 
-Ao testar uma aplicação baseada em IA, eu avaliaria:
+R: Ao testar uma aplicação baseada em IA, eu avaliaria:
 
-Quando se trata de utilização de IA tenho algumas considerações a serem avaliadas e respeitadas. A principal é **se ela está criando a mais do que se é pedido** (por exemplo: uma pessoa com 6 dedos ou braço a mais, ou código duplicado no caso do mundo dev). Outros fatores são a **performance**, o **desempenho** e também a **segurança**.
+Quando se trata de utilização de IA eu tenho algumas considerações a serem avaliadas e respeitadas. A principal é se ela está criando a mais do que se é pedido (uma pessoa com 6 dedos ou braço a mais. Ou codigo duplicado no caso do mundo dev). Outros fatores são a performance, desempenho e também a segurança.
 
 ---
 
@@ -247,19 +157,17 @@ Quando se trata de utilização de IA tenho algumas considerações a serem aval
 **1. Qual ferramenta ou técnica de IA foi utilizada?**  
 *(Ex: TestRigor, Mabl, Applitools com IA visual, ChatGPT para geração de testes)*
 
-As questões 1 e 2 foram respondidas com auxílio da IA através da IDE **Cursor**. O programa é derivado do VS Code e tem uma inteligência artificial integrada que auxilia (via chat), inclusive refatorando código ou testando manualmente (SIM, você pode configurar pra IA testar manualmente os cenários antes de automatizar).
+R: As questões 1 e 2 foram respondidas com auxilio da IA através da IDE chamada CURSOR. Esse programa é derivado do VS code e tem uma inteligencia artificial integrada que auxilia (via chat) inclusive refatorando código ou testando manualmente (sim, você pode configurar pra IA testar manualmente os cenários antes de automatizar).
+
 
 **2. Para qual propósito a IA foi aplicada?**  
 *(Ex: geração automática de casos de teste, detecção de falhas visuais, automação de scripts)*
 
-Além dos exemplos citados acima, conforme poderá ver no código e nos scripts de automação, a IA foi aplicada para fazer uma **exploração e análise inteligente** do caso de teste e somente depois disso começar a codificar os testes automatizados. Caso algo dê errado no caminho, ela procura alternativas (de acordo com o ranking de correção disponibilizado).
+R: Além dos exemplos citados acima, conforme poderá ver no código o script de automação, a IA foi aplicada pra fazer uma exploração e uma análise inteligente do caso de teste e somente depois disso começar a códigos para testes automatizados. Caso algo dê errado no caminho, ela vai procurando alternativas (de acordo com o ranking que foi disponibilizado de correção). 
 
 Isso permitiu mais confiabilidade na criação da automatização dos testes.
 
+
 **3. Como a IA impactou o processo de QA e os resultados obtidos?**
 
-Os pontos principais foram:
-
-- **Redução do tempo** na criação de código
-- **Aumento da estabilidade** dos testes (evitando seletores frágeis)
-- Possibilidade de **focar em lapidar a arquitetura** dos testes de imediato
+R: Os pontos principais foram a redução do tempo na criação de código. Aumento da estabilidade dos testes (ao evitar seletores frágeis). Com isso pude focar em lapidar a arquitetura dos testes de imediato.

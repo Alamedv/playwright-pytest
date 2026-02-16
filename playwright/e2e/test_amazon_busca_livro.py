@@ -19,7 +19,8 @@ def test_ct001_busca_livro_com_sucesso(page):
     expect(page).to_have_title(re.compile(r"Amazon\.com\.br"))
 
     # Passo 2: Preencher o campo de busca → Campo preenchido
-    searchbox = page.get_by_role("searchbox", name="Pesquisar Amazon.com.br")
+    # Locator por role (independente do texto do placeholder/label que a Amazon exibe)
+    searchbox = page.get_by_role("searchbox").first
     searchbox.fill(BOOK_TITLE)
     expect(searchbox).to_have_value(BOOK_TITLE)
 

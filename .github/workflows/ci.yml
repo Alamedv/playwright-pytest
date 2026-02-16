@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [main, master]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -64,3 +73,18 @@ jobs:
           path: allure-results/
           retention-days: 14
           if-no-files-found: ignore
+
+      - name: Upload Allure report for GitHub Pages
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && always()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report/
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment: github-pages
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
