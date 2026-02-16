@@ -46,7 +46,7 @@ pytest -v                 # verboso
 pytest playwright/e2e/ -v
 pytest playwright/api/test_api_posts.py -v
 
-python -m pytest playwright/e2e/test_amazon_busca_livro.py -v --headed | *comando alternativo 
+python -m pytest playwright/e2e/test_amazon_busca_livro.py -v --headed | *comando alternativo*
 
 
 ```
@@ -69,7 +69,7 @@ Não abra o `index.html` com duplo clique (ficará em "Loading..." por restriç�
 
 ### Ver no CI (GitHub Actions)
 
-- **URL pública (GitHub Pages):** `https://<SEU_USUARIO>.github.io/<NOME_DO_REPOSITORIO>/`  
+- **URL pública (GitHub Pages):** `https://<SEU_USUARIO>.github.io/<NOME_DO_REPOSITORIO>/` - Por exemplo: https://alamedv.github.io/playwright-pytest/  
   Ative em **Settings → Pages → Source: GitHub Actions**. O relatório é atualizado a cada push em `main`/`master`.
 - **Artefatos:** em **Actions** → execução → **Artifacts** baixe **allure-report** ou **allure-results** (disponíveis 14 dias).
 
